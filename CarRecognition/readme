@@ -1,0 +1,13 @@
+In order to run the code the following requirements should be met:
+
+1. Theano, follow the instructions here: http://deeplearning.net/software/theano/install.html
+2. Keras, follow the instructions here: https://github.com/fchollet/keras (note that pyyaml, HDF5 and h5py are needed as dependencies)
+
+
+After the dependencies are satisfied you need to download the CompCars dataset (surveillance data) from http://mmlab.ie.cuhk.edu.hk/datasets/comp_cars/index.html in the current folder
+Then run sh resize.sh so that the images are resized properly to 224x224 (this should take ~25 minutes)
+The initial VGG16 weights can be downloaded from https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3
+The final weights which achieve 92.5% accuracy can be downloaded from https://www.dropbox.com/s/gs9w3i36aotzzb6/weights_final?dl=0
+Now you should be ready to run cnn_train.py and cnn_test.py. Beware that if you don't have CUDA and CuDNN enabled the running time will be quite slow. The training took ~15 hours on my CUDA with CuDNN enabled machine and the testing took ~5 minutes (for the whole test set which is around 13,000 images). 
+
+
