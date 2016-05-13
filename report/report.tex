@@ -7,16 +7,19 @@
 
 %math packages
 \usepackage{amsmath}
+\usepackage{amssymb}
 \usepackage{amsfonts}
   \DeclareMathOperator*{\argmax}{arg\,max}
   \newcommand{\ex}[1]{{\mathbb E}\left[ #1 \right]}
   \newcommand\norm[1]{\left\lVert#1\right\rVert}
 
 \usepackage{a4wide}
+\usepackage{cool}
 \usepackage{float}
 \usepackage{enumerate}
 \usepackage{graphicx}
 \usepackage {tikz}
+\usepackage{caption}
 \usepackage{subcaption}
 \usepackage{booktabs}
 \usepackage{csquotes}
@@ -85,45 +88,66 @@ the deep network.
 \subsection*{3) Convolutional Neural Networks}
 \begin{justify}
 
-This section describes the classical architecture and training of a convolutional neural network. The next figure 1 (LeNet-5 Yann LeCun [5]) shows the basic structure of such a network.There are several blocks which should be discussed:
+This section describes the classical architecture and training of a convolutional neural network. The next figure (LeNet-5 Yann LeCun [5]) shows the basic structure of such a network.
+
+	\begin{tcolorbox}
+		\begin{figure}[H]
+			\begin{center}
+				\includegraphics[width=0.95\textwidth]{fig-1.png}
+				\caption{Architecture of LeNet-5, a Convolutional Neural Network}
+			\end{center}
+		\end{figure}
+	\end{tcolorbox}
+
+There are several blocks which should be discussed:
 \newline
 \\
 \textbf{Input to the network:} The input layer will hold the raw pixel values of the image. In this case it is of size 32x32. It can also hold color information by stacking different color channels (such as RGB).
 \newline
 \\
 \textbf{Convolutional layer:} This is the core building block of a convolutional neural network. This layer will compute the output of neurons which are connected to local regions in the previous input layer.
-The convolution is just a dot product between the weights of the convolutional kernel and region it is connected to in the input. Usual kernel sizes are 3x3,5x5 and 7x7. The idea can be seen visually in the following figure 2: [6].
+The convolution is just a dot product between the weights of the convolutional kernel and the region it is connected to in the input. Usual kernel sizes are 3x3,5x5 and 7x7. The idea can be seen visually in the following figure: [6].
    	\begin{tcolorbox}
    		\begin{figure}[H]
    			\begin{center}
-   				%\includegraphics[width=0.6\textwidth]{1_a.eps}
-   				%\caption{1-D Gaussian}
+   				\includegraphics[width=0.85\textwidth]{fig-2.png}
+   				\caption{An example volume of neurons in Convolutional Layer}
    			\end{center}
    		\end{figure}
    	\end{tcolorbox}
 
-Usually, several such kernels are used in order to extract different features from the input. In figure 1, it can be seen that there are 6 such feature maps. A small detail about this convolutional layer is the so called padding (e.g adding zeroes to the border of the input). If we don't use any padding than the size of the feature maps is smaller than the input (28x28 instead of 32x32,see figure 1). The convolutional kernels will be learned during the training (backpropagation stage).
+Usually, several such kernels are used in order to extract different features from the input. In figure 1, it can be seen that there are 6 such feature maps. A small detail about this convolutional layer is the so-called padding (e.g adding zeroes to the border of the input). If we don't use any padding then the size of the feature maps is smaller than the input (28x28 instead of 32x32,see figure 1). The convolutional kernels will be learned during the training (backpropagation stage).
 \newline
 \\
-\textbf{Nonlinearity:} The convolutional operation so far is a linear operation. In order to be able to represent more complex patterns we need to break this linearity. The most common non-linearity used after the convolutional layer is the rectified linear unit \textit{(ReLU)} f(x) = max(0,x) which is applied elementwise to the feature maps and leaves the output size unchanged. The ReLU has many nice properties, one of which is that it deals with the vanishing gradient problem. 
+\textbf{Nonlinearity:} The convolutional operation so far is a linear operation. In order to be able to represent more complex patterns we need to break this linearity. The most common non-linearity used after the convolutional layer is the Rectified Linear Unit \textit{(ReLU)} f(x) = max(0,x) which is applied elementwise to the feature maps and leaves the output size unchanged. The ReLU has many nice properties, one of which is that it deals with the vanishing gradient problem. 
 \newline
 \\
-\textbf{Pooling:} The next layer after the convolutional layer is the pooling layer. Its function is to reduce the spatial size of the input. This is done to reduce the trainable parameters of the network as well as to control overfitting. The pooling operation works independently on each convolutional feature map by applying the so-called MAX operation in a 2x2 region (usually). This operation results into decreasing the input by half, as it can be seen in figure 1. 
+\textbf{Pooling:} The next layer after the convolutional layer is the pooling layer. Its function is to reduce the spatial size of the input. This is done to reduce the trainable parameters of the network as well as to control overfitting. The pooling operation works independently on each convolutional feature map by applying the so-called MAX operation in a 2x2 region (usually). This operation results in decreasing the input by half, as it can be seen in figure 1. 
 \newline
 \\
-\textbf{Fully-connected layer:} After a successive stacking of CONV and POOL layers, a fully-connected layer is usually used. It applies an affine transformation to its inputs as in a classical neural network. Mathematically, from `n' inputs to `h' outputs it works as the following: \textit{f(X) = WX + b}, where W belongs to R(nxh) and b belongs to R(h). The output therefore depends on the learnable matrix of parameters W as well as on the learnable bias b.
+\textbf{Fully-connected layer:} After a successive stacking of CONV and POOL layers, a fully-connected layer is usually used. It applies an affine transformation to its inputs as in a classical neural network. Mathematically, from `n' inputs to `h' outputs it works as the following: \textit{f(X) = WX + b}, where W $\in$ $\mathbb{R}^{n \times h}$ and b $\in \mathbb{R}^{h}$. The output therefore depends on the learnable matrix of parameters W as well as on the learnable bias b.
 \newline
 \\
-\textbf{Dropout:} Dropout is non-deterministic operation which is used in the training of modern deep neural networks. A dropout layer takes a number of input connections and sets them to zero with probability p and leaves the others unchanged with probability 1-p. The value p is a hyperparameter for the network. The general idea of dropout can be interpreted as a form of regularizer. By dropping some connections randomly, the network finds a way to compute a result in many different ways rather than just relying heavily on a single connection. 
+\textbf{Dropout:} Dropout is non-deterministic operation which is used in the training of modern deep neural networks. A dropout layer takes a number of input connections and sets them to zero with probability `p' and leaves the others unchanged with probability `1-p'. The value `p' is a hyperparameter for the network. The general idea of dropout can be interpreted as a form of regularizer. By dropping some connections randomly, the network finds a way to compute a result in many different ways rather than just relying heavily on a single connection. 
 \newline
 \\
-\textbf{Softmax layer:} This is the last layer of the network which computes class scores which will be fed into the loss function. There are no learnable parameters in this layer, it is just a convenient way to compute class probabilities. Mathematically, the i-th class probability f(x)i is computed as follows: f(x)i = e\^xi / sum e\^xj
-\newline
-\\
+\textbf{Softmax layer:} This is the last layer of the network which computes class scores which will be fed into the loss function. There are no learnable parameters in this layer, it is just a convenient way to compute class probabilities. Mathematically, the $i^{th}$ class probability $f(x)_{i}$ is computed as follows: 
+\begin{equation*}
+		f(x)_{i} = \frac{ e^{x_{i}} }{\sum_{j=1}^{J}e^{x_{j}}} \hspace*{2em} \textit{for i=1, ..., J}
+\end{equation*}
+
 \textbf{Training the network:}
-For the training of the network the categorical cross-entropy loss is usually used. It is defined as: -log(X$y_i$), where X is the output of the softmax layer and $y_i$ is the correct class label. Using the gradient of this loss function, all the parameters of the network mentioned earlier are updated using successive applications of the chain rule. Ultimately, we are interested in the gradient of the output of our network f with respect to its input x. The chain rule tells us that delta f / delta x = delta f / delta q * delta q / delta x  for intermediate value q. Of course, for a convolutional neural network this expression is much more involved because we have to find derivatives of the nonlinearities, pooling and the convolutions. For simplicity, these derivations are skipped as in practice people usually use some software packages for the computation of these derivatives (e.g Theano). For the actual update of the parameters, stochastic gradient descent is the most common used optimization method.
-\newline \textbf{//(include some pseudocode for SGD)//}.\newline
-In practice, \textit{SGD + Nesterov momentum} is used since it converges quicker. The idea of Nesterov momentum is that it keeps track of a variable ``v'' that is a function of the magnitude of previous updates, allowing the learning rate to depend on this variable. This type of update is more tolerant to different values of learning rate and can adapt over time based on how quickly the parameters are changing.
+For the training of the network, the \textit{Categorical Cross-Entropy} loss is usually used. It is defined as: -log($X_{y_{i}}$), where X is the output of the softmax layer and $y_i$ is the correct class label. Using the gradient of this loss function, all the parameters of the network mentioned earlier are updated using successive applications of the chain rule. Ultimately, we are interested in the gradient of the output of our network `f' with respect to its input `x'. The chain rule tells us that $\pderiv{f}{x} = \pderiv {f}{q} * \pderiv {q}{x} $  for some intermediate value \textit{q}. Of course, for a convolutional neural network this expression is much more involved because we have to find derivatives of the non-linearities, pooling and the convolutions. For simplicity, these derivations are skipped as in practice people usually use some software packages for the computation of these derivatives (e.g Theano, Tensorflow). For the actual update of the parameters, Stochastic Gradient Descent is the most commonly used optimization method.
+ 	\begin{tcolorbox}
+ 		\begin{figure}[H]
+ 			\begin{center}
+ 				\includegraphics[width=0.85\textwidth]{fig-3.png}
+ 				\caption{Pseudocode for SGD [from DSP lecture-16]}
+ 			\end{center}
+ 		\end{figure}
+ 	\end{tcolorbox}
+ 
+In practice, \textit{SGD + Nesterov momentum} is used since it converges quicker than using only SGD. The idea of Nesterov momentum is that it keeps track of a variable `v' that is a function of the magnitude of previous updates, allowing the learning rate to depend on this variable. This type of update is more tolerant to different values of learning rate and can adapt over time based on how quickly the parameters are changing.
 
 \end{justify}
 
@@ -140,43 +164,60 @@ The first thing we tried was to train a not so deep ConvNet from scratch with th
 Input (224x224x3) $\rightarrow$ CONV(5x5, 32 filters) $\rightarrow$ POOL(2x2) $\rightarrow$ CONV(5x5, 32 filters) $\rightarrow$ POOL(2x2) $\rightarrow$ FC(256 units, p=0.5 dropout) $\rightarrow$ Softmax $\rightarrow$ Categorical Cross-Entropy
 \end{tcolorbox}
 
-The training was relatively fast but the accuracy on the test set was not satisfactory (less than 75\%). We then tried to increase the number of convolutional maps as well as the number of fully-connected(FC) units. The accuracy improved a little but the training time increased a lot. Then we switched to the more promising idea of transfer learning. The architecture we chose is \textit{VGG16} because of its simplicity and publicly available pretrained weights for Theano. The network was trained on the ImageNet dataset. The network is shown in the next figure 3 [8].
-   	\begin{tcolorbox}
+The training was relatively fast but the accuracy on the test set was not satisfactory (less than 75\%). We then tried to increase the number of convolutional maps as well as the number of fully-connected(FC) units. The accuracy improved a little but the training time increased a lot. Then we switched to the more promising idea of transfer learning. The architecture we chose is \textit{VGG16} because of its simplicity and publicly available pretrained weights for Theano. The network was trained on the ImageNet dataset. The network is shown in the next figure [8].
+
    		\begin{figure}[H]
+   			\vspace*{-6em}
    			\begin{center}
-   				%\includegraphics[width=0.6\textwidth]{1_a.eps}
-   				%\caption{1-D Gaussian}
+   				\includegraphics[width=0.15\textwidth]{vgg-vert.jpg}
+   				\caption{Architecture of VGG16}
    			\end{center}
    		\end{figure}
-   	\end{tcolorbox}
-   	
+ 	
 We then proceeded as follows:\newline
 1. Since the input to the network is 224x224x3 we had to resize all the images such that the minimum dimension is of size 256 and then we did a central crop of 224x224. We kept the original aspect ratio.
 \newline
 2. Subtract the mean channel values from all the training/testing images in our dataset.
 \newline
-3. We created the VGG16 architecture in our code and initialized the convolutional layers' weights with the pretrained weights. The fully-connected layers were initialized randomly.
+3. We created the VGG16 architecture in our code and initialized the convolutional layers' weights with the pretrained weights. The fully-connected layers were initialized randomly. The number of classes were changed from 1000 to 281 to fit the number of classes of our dataset.
 \newline
-4. We used Stochastic Gradient Descent with Nesterov Momentum for the fine-tuning of the convolutional weights and training of the fully-connected layers. The learning rate was set to 0.0001 so that we don't change the pretrained weights too much. The decay was set to 1$e^{-6}$ and the momentum to 0.9. The biggest batch size we were able to fit into the GPU memory was 12. 
+4. We used Stochastic Gradient Descent with Nesterov Momentum for the fine-tuning of the convolutional weights and training of the fully-connected layers. The learning rate was set to 0.0001 so that we don't change the pre-trained weights too much. The decay was set to 1$e^{-6}$ and the momentum to 0.9. The biggest batch size we were able to fit into the GPU memory was 12. 
 \end{justify}
 
 \subsection*{6) Implementation details}
 \begin{justify}
 \flushleft
-\textbf{Dataset:} We downloaded the surveillance data from the CompCars dataset from [URL] . It is split into 70\% training images and 30\% testing images. There are a total of 44,481 images. Here are some sample images:
-   	\begin{tcolorbox}
-   		\begin{figure}[H]
-   			\begin{center}
-   				%\includegraphics[width=0.6\textwidth]{1_a.eps}
-   				%\caption{1-D Gaussian}
-   			\end{center}
-   		\end{figure}
-   	\end{tcolorbox}
-   	
+\textbf{Dataset:} We downloaded the surveillance data from the CompCars dataset from \url{http://mmlab.ie.cuhk.edu.hk/datasets/comp_cars/index.html} . It is split into 70\% training images and 30\% testing images. There are a total of 44,481 images. Here are some sample images:
+
+   	\begin{figure}[H]
+   		\centering
+   		\hspace*{-6.7em}
+   		\begin{minipage}{.5\textwidth}
+   			\centering
+   			\includegraphics[width=0.4\textwidth]{car-1.jpg}
+   		\end{minipage}%
+   		\hspace*{-11.7em}
+   		\begin{minipage}{.5\textwidth}
+   			\centering
+	   		\includegraphics[width=0.4\textwidth]{car-2.jpg}
+   		\end{minipage}%
+   		\hspace*{-11.7em}
+   		\begin{minipage}{.5\textwidth}
+   			\centering
+   			\includegraphics[width=0.4\textwidth]{car-3.jpg}
+   		\end{minipage}%
+   		\hspace*{-11.7em}
+   		\begin{minipage}{.5\textwidth}
+   			\centering
+   			\includegraphics[width=0.4\textwidth]{car-4.jpg}
+   		\end{minipage}
+   		\caption{Some Car Models from the dataset}
+   	\end{figure}
+
 \textbf{Software frameworks:} Theano + Keras
 For installation, please see the README file
 \newline
-\textbf{VGG16 pretrained weights:} We downloaded the weights from here [URL]
+\textbf{VGG16 pretrained weights:} We downloaded the weights from here \url{https://gist.github.com/baraldilorenzo/07d7802847aaad0a35d3}
 \newline
 \\
 \textbf{Hardware Used:} The training was done on a XMG p505 laptop with CUDA and CuDNN enabled. The laptop has nVidia GTX 970 and 3GB of GPU memory, 16 GB of RAM and i7 4720 CPU. The training took around 1 hour per epoch.
@@ -184,8 +225,36 @@ For installation, please see the README file
 \end{justify}
 
 \subsection*{7) Results}
-To be included
+The following figures show the results we got through the training process.
 
+   	\begin{figure}[H]
+   		\centering
+   		\begin{minipage}{0.7\textwidth}
+   			\centering
+   			\includegraphics[width=0.7\textwidth]{train-acc.jpg}
+   		\end{minipage}%
+   		\hspace*{-8.7em}
+   		\begin{minipage}{0.7\textwidth}
+   			\centering
+   			\includegraphics[width=0.7\textwidth]{train-loss.jpg}
+   		\end{minipage}
+	\caption{\textit{Train Accuracy and Train Loss}}
+   	\end{figure}
+   	
+   	\begin{figure}[H]
+   		\begin{minipage}{0.7\textwidth}
+   			\centering
+   			\includegraphics[width=0.7\textwidth]{test-acc.jpg}
+   		\end{minipage}%
+   		\hspace*{-8.7em}
+   		\begin{minipage}{0.7\textwidth}
+   			\centering
+   			\includegraphics[width=0.7\textwidth]{test-loss.jpg}
+   		\end{minipage}
+   		\caption{\textit{Test Accuracy and Test Loss}}
+   	\end{figure}
+The training accuracy could increase even further but we stopped the training after the 15-th epoch since the network started to overfit, resulting into decrease in the test accuracy. We could squeeze a little extra test accuracy by adding a stronger regularizer which is discussed in the next section.
+The best test accuracy we were able to achieve was \textbf{92.5\%}.
 \subsection*{8) Conclusion and Future work}
 \begin{justify}
 \flushleft
@@ -194,10 +263,11 @@ To be included
   	\item Several models can be trained (e.g 5) and then the final prediction of the class label can be done with majority voting. Model ensembles usually improve the performance.
   	\item Gather more training data through data augmentation. Augment the data through different transformations such as horizontal/vertical flip,shear,color shift, ZCA whitening, etc.
   	\item Try bigger/deeper models such as VGG19 or an even more recent network such as ResNet [10]
+  	\item Try L2 or L1 regularization in order to penalize the learned weights which might prevent overfitting.
   \end{itemize}
 \end{justify}
 
-\subsection*{References}
+\subsection*{9) References}
 \flushleft
 1)\hyperref{http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.488.284&rep=rep1&type=pdf}{}{}{citeseerx.ist.psu.edu/viewdoc/download}
 2)\url{https://cseweb.ucsd.edu/classes/wi08/cse190-a/reports/scheung.pdf}
